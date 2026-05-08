@@ -1,0 +1,6 @@
+id=yurikey_auto_refresh
+name=YuriKey Auto-Refresh
+version=v1.0
+versionCode=1
+author=mendel
+description=Automatically re-runs YuriKey action every 7 days to keep Play Integrity alive

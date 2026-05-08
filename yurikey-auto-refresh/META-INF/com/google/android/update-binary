@@ -1,0 +1,14 @@
+#!/sbin/sh
+SKIPUNZIP=1
+
+# Extract module files to module path
+unzip -o "$ZIPFILE" 'module.prop' -d "$MODPATH" >&2
+unzip -o "$ZIPFILE" 'service.sh' -d "$MODPATH" >&2
+
+# Set permissions
+set_perm_recursive "$MODPATH" root root 0755 0644
+set_perm "$MODPATH/service.sh" root root 0755
+
+ui_print "- YuriKey Auto-Refresh installed"
+ui_print "- Will refresh keybox/fingerprint every 7 days automatically"
+ui_print "- Log: /data/adb/yurikey_auto_refresh.log"

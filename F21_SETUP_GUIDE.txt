@@ -1,0 +1,325 @@
+============================================================
+  QIN F21 PRO — COMPLETE SETUP GUIDE
+  Verizon LTE Bands + Root + Play Store Certified
+============================================================
+
+REQUIREMENTS
+  - Windows PC
+  - USB-A cable (USB-C cables may not work with SP Flash Tool)
+  - ADB + Fastboot (Platform Tools) installed and in PATH
+      Download: https://developer.android.com/tools/releases/platform-tools
+      After extracting, add the folder to your Windows PATH, or just
+      run all adb commands from inside that folder.
+  - Developer Options + USB Debugging enabled on the phone
+
+PHONE TO BUY
+  DuoQin F21 Pro — make sure it is the MT6761 variant (not Snapdragon).
+  The Verizon band unlock only applies to the MediaTek version.
+
+HOW TO BOOT TWRP
+  Hold the heart/owl key (top left) + the * star key (bottom left)
+  simultaneously. Hold until the DuoQin logo appears, then keep
+  holding until TWRP boots. If it boots to Android instead, try again.
+
+IMPORTANT — DO NOT EVER FLASH OR MODIFY THESE PARTITIONS:
+  nvdata  /  nvram  /  nvcfg  /  md1img_a
+  These hold your IMEI, Bluetooth, and Wi-Fi identifiers.
+  Stage 3 intentionally writes to them once. After that, never again.
+
+------------------------------------------------------------
+STAGE 1 — UNROOT (if coming from a rooted state)
+------------------------------------------------------------
+
+Download the unroot tool (password: mlgmxyysd):
+  [your mediafire link here]
+
+Unzip it (use 7-Zip or WinRAR if Windows built-in unzip fails).
+Run the tool and follow its prompts.
+Phone will reboot to a clean, unrooted state.
+
+
+------------------------------------------------------------
+STAGE 2 — INSTALL CLEAN OS
+------------------------------------------------------------
+
+ALL FILES (firmware + tools) FOR WINDOWS:
+  https://www.mediafire.com/file/tl8hv77gl0vo6sd/qin_f21_pro_mtk.zip/file
+
+Step 1: Extract the downloaded zip.
+Step 2: Extract "F21PRO_1.1.1 (2).zip" — this is the firmware.
+Step 3: Install DriveInstall.exe (MediaTek USB driver).
+Step 4: Extract "SP_Flash_Tool_V5.zip".
+
+Step 5: Open SP_Flash_Tool_V5\flash_tool.exe
+Step 6: Click "Scatter-loading File" and select:
+          Main Firmware folder → MT6761_Android_scatter.txt
+Step 7: Click Download.
+Step 8: Turn the phone OFF.
+Step 9: Hold the BACK button (top right on the phone), then plug in
+        the USB cable. Flashing will start automatically.
+        NOTE: On Windows 10 you may need to delete conflicting drivers
+        in Device Manager before the phone is detected.
+Step 10: After flashing, turn the phone on. First boot takes a few
+         minutes — be patient.
+
+  *** If the phone says "DEVICE ENCRYPTED" and won't boot: ***
+  Boot to TWRP → tap Wipe → Format Data → type "yes" → reboot.
+
+Step 11: Transfer these files to the phone's internal storage
+         (you can do this via ADB or by booting to Android first):
+           - boot_2.img
+           (from the qin_f21_pro_mtk folder)
+
+Step 12: Boot to TWRP.
+Step 13: In TWRP, tap Install → tap "Install Image" (bottom right toggle)
+         → navigate to /sdcard → select boot_2.img → flash to Boot partition.
+
+         Also flash (as regular ZIPs, not images):
+           - open_gapps-arm64-11.0-pico-20211217.zip
+           (tap Install → navigate to the zip → swipe to flash)
+
+Step 14: Reboot to System. You now have a clean OS with GApps installed.
+
+
+------------------------------------------------------------
+STAGE 3 — UNLOCK VERIZON LTE BANDS
+------------------------------------------------------------
+
+Bands unlocked: 2, 4, 12, 13, 17, 66, 71
+
+Files package (F30 modem files + edited scatter + SN Write tool):
+  https://www.mediafire.com/file/3fba0dugos3lkdv/F30_US_LTE_Bands_Package.zip/file
+
+Step 1: Write down your F21's IMEI, Wi-Fi MAC, and Bluetooth Address.
+        Settings → About Phone. WRITE THESE DOWN. YOU WILL NEED THEM.
+
+Step 2: Boot to TWRP (hold heart key + star key).
+
+Step 3: From your PC, run these ADB commands to back up your modem files:
+          adb pull /dev/block/by-name/nvdata
+          adb pull /dev/block/by-name/nvram
+          adb pull /dev/block/by-name/nvcfg
+        Store these backups somewhere safe. Do not skip this.
+
+Step 4: Power off the phone completely (TWRP → Reboot → Power Off).
+
+Step 5: Open SP Flash Tool. Load the scatter file from the F30 package:
+          MT6761_Android_scatter - edited.txt
+        This reveals the NVData/NVRam/NVcfg/md1img_a partitions.
+
+Step 6: Uncheck everything EXCEPT: nvcfg, nvdata, nvram, md1img_a.
+        UNCHECK preloader — it must not be flashed even though it appears.
+
+Step 7: For each checked row, confirm the file path points to the
+        corresponding file from the F30 package.
+
+Step 8: Click the green Download arrow. Hold the BACK button on the phone
+        and plug in USB. It will flash. Keep the phone OFF when done.
+
+Step 9: Open SNWrite tool.
+        - ComPort: USBVCOM
+        - Target Type: Smart Phone
+        - System Config → Write Option: check ONLY IMEI, BT Address, Wifi Address
+        - DataBase File section: check "Load AP DB from DUT" and "Load Modem DB from DUT"
+        - MD1_DB: select MDDB_InfoCustomAppSrcP_MT6761_S00_MOLY_LR12A_R3_MP_V88_3_1_ulwctg_n.EDB
+                  (in AP DB Base\MT6761 folder inside SNWrite)
+        - AP_DB: select APDB_MT6761_S01__W1947
+                 (same folder)
+        - Click Save.
+
+Step 10: Back in the main SNWrite window, click Start.
+         In the new window:
+           IMEI_1   = your original IMEI
+           BT Addr  = your Bluetooth address (no colons)
+           Wifi Addr = your Wi-Fi MAC (no colons)
+         Have the phone ready. Hold BACK button and plug in USB, then click OK.
+         Wait for the green PASS signal.
+
+Step 11: Turn on the phone. Verify in Settings → About Phone that
+         your original IMEI, Wi-Fi MAC, and Bluetooth address are correct.
+
+Step 12: Re-enable Developer Options: tap Build Number 7 times.
+
+Step 13: Confirm bands via phone dialer: *#*#3646633#*#*
+         → Band Mode → scroll through to confirm bands 2, 4, 12, 13, 17, 66, 71.
+
+
+------------------------------------------------------------
+STAGE 4 — ROOT + PLAY INTEGRITY (all 3 levels)
+------------------------------------------------------------
+
+This stage replaces the old MagiskHide/Props method entirely.
+The new method achieves Basic + Device + Strong Play Integrity
+on a rooted phone without registering GSF IDs or using Props.
+
+--- DOWNLOADS ---
+
+Get these files onto your PC before starting:
+
+  Magisk 27.0 APK
+    https://github.com/topjohnwu/Magisk/releases/download/v27.0/Magisk-v27.0.apk
+    (rename .apk to .zip for TWRP flashing)
+
+  Zygisk Next (ZygiskNext zip)
+    https://github.com/Dr-TSNG/ZygiskNext/releases
+    Download the latest zygisksu-*.zip
+
+  PlayIntegrityFork (by osm0sis)
+    https://github.com/osm0sis/PlayIntegrityFork/releases
+    Download PlayIntegrityFork-v*.zip
+
+  YuriKey v3.0.5
+    https://github.com/Yurii0307/yurikey/releases/download/v3.0.5/Yurikey-v3.0.5.signed.zip
+
+  TrickyStoreOSS v2.1.0
+    https://github.com/beakthoven/TrickyStoreOSS/releases/download/v2.1.0/Tricky-Store-OSS-v2.1.0-41-b8b03e4-Release.zip
+
+
+--- STEP 1: PATCH BOOT IMAGE WITH MAGISK 27 ---
+
+1a. Copy the Magisk-v27.0.apk to the phone's internal storage.
+    In TWRP, install it as an APK (or in Android, tap it to install the app).
+
+    Easier method: rename Magisk-v27.0.apk → Magisk-v27.0.zip and
+    flash it via TWRP just like you did with GApps.
+
+1b. Transfer boot_2.img to the phone's storage (if not already there).
+
+1c. Boot to Android. Open the Magisk app.
+    Tap "Install" → "Select and Patch a File" → choose boot_2.img.
+    Magisk will create magisk_patched_*.img in your Downloads folder.
+
+1d. Boot to TWRP.
+    Install → Install Image → select magisk_patched_*.img → flash to Boot.
+
+1e. Reboot to System. Open Magisk app and confirm it shows v27.0 installed.
+
+
+--- STEP 2: CONFIGURE MAGISK ---
+
+In the Magisk app → Settings:
+  - Enable Zygisk: OFF  (ZygiskNext will replace it)
+  - Enable Enforce DenyList: OFF
+  - Do NOT enable MagiskHide
+
+
+--- STEP 3: INSTALL MODULES ---
+
+In the Magisk app → Modules → Install from storage:
+  Install each zip in this order, rebooting only after ALL are installed:
+
+  1. zygisksu-*.zip          (Zygisk Next — replaces built-in Zygisk)
+  2. PlayIntegrityFork-v*.zip
+  3. Yurikey-v3.0.5.signed.zip
+  4. Tricky-Store-OSS-v2.1.0-*-Release.zip
+
+  After installing all four, reboot.
+
+
+--- STEP 4: APPLY SELINUX FIX FOR TRICKYSTOREOSS ---
+
+THIS STEP IS REQUIRED. Without it, TrickyStoreOSS cannot inject into
+the keystore on Android 11 and Play Integrity will not pass.
+
+Create a file called post-fs-data.sh on your PC with this exact content
+(use Notepad++ or VS Code and save with LF line endings, not CRLF):
+
+---- BEGIN FILE CONTENT ----
+MODDIR=${0%/*}
+
+magiskpolicy --live \
+  "allow system_file keystore unix_dgram_socket *" \
+  "allow keystore system_file unix_dgram_socket *" \
+  "allow keystore system_file file *" \
+  "allow crash_dump keystore process *" \
+  "allow magisk keystore process *" \
+  "allow magisk keystore unix_dgram_socket *" \
+  "allow adb_data_file keystore unix_dgram_socket *" \
+  "allow adb_data_file keystore process *" \
+  "allow system_file keystore process *" 2>/dev/null
+---- END FILE CONTENT ----
+
+With the phone booted and USB debugging on, run these ADB commands:
+
+  adb push post-fs-data.sh /data/local/tmp/post-fs-data.sh
+  adb shell su -c "cp /data/local/tmp/post-fs-data.sh /data/adb/modules/tricky_store/post-fs-data.sh"
+  adb shell su -c "chmod 755 /data/adb/modules/tricky_store/post-fs-data.sh"
+
+Verify it was written:
+  adb shell su -c "ls -la /data/adb/modules/tricky_store/post-fs-data.sh"
+  (should show -rwxr-xr-x and a size > 0)
+
+
+--- STEP 5: GET KEYBOX + FINGERPRINT VIA YURIKEY ---
+
+5a. In the Magisk app → Modules, tap the Action button (▶) next to YuriKey.
+    This runs YuriKey's scripts which:
+      - Fetch a fresh keybox from the YuriKey server
+      - Auto-set a valid Pixel fingerprint via PlayIntegrityFork
+      - Update the security patch date
+
+5b. Wait about 30 seconds for it to complete. You may see a brief
+    loading screen or a toast notification when done.
+
+
+--- STEP 6: REBOOT AND VERIFY ---
+
+6a. Reboot the phone.
+
+6b. After fully booting, open any Play Integrity checker app
+    (e.g. "Play Integrity API Checker" from the Play Store).
+    You should see:
+      MEETS_BASIC_INTEGRITY      ✓
+      MEETS_DEVICE_INTEGRITY     ✓
+      MEETS_STRONG_INTEGRITY     ✓
+
+    If you only get Basic: wait 5 minutes and try again. GMS needs
+    time to cache the new attestation after a fresh boot.
+
+
+--- TROUBLESHOOTING ---
+
+"Stuck loading" in integrity checker:
+  Run: adb shell su -c "kill $(pidof com.google.android.gms.unstable)"
+  Then check again.
+
+Only Basic after reboot:
+  Make sure the post-fs-data.sh SELinux fix was applied (Step 4).
+  Run: adb shell su -c "cat /data/adb/modules/tricky_store/post-fs-data.sh"
+  It should show the magiskpolicy commands. If empty, redo Step 4.
+
+TrickyStoreOSS not running:
+  Run: adb shell su -c "ps -A | grep TrickyStore"
+  If nothing appears, check: adb shell su -c "ls /data/adb/modules/tricky_store/disable"
+  If the disable file exists: adb shell su -c "rm /data/adb/modules/tricky_store/disable"
+  Then reboot.
+
+Integrity expires over time:
+  Open Magisk → Modules → tap YuriKey Action button → reboot.
+  This rotates to a fresh fingerprint and keybox.
+
+
+--- ADDING GOOGLE WORKSPACE / WORK ACCOUNT ---
+
+Settings → Accounts → Add Account → Google.
+Sign in normally. With all three integrity levels passing, the account
+will be accepted without needing to register a GSF ID manually.
+If your Workspace admin requires device approval, go to admin.google.com
+→ Devices and approve the device from there.
+
+
+------------------------------------------------------------
+NOTES
+------------------------------------------------------------
+
+- The Verizon band unlock (Stage 3) is permanent and survives factory
+  resets and OS reflashes, as long as you do not re-flash nvdata/nvram/
+  nvcfg/md1img_a. Never touch those partitions again.
+
+- If you ever need to start over from scratch, redo Stages 1-4 in order.
+  Stage 3 does NOT need to be repeated — the bands stay unlocked.
+
+- TrickyStoreOSS repository is archived (read-only) as of Dec 2025 but
+  v2.1.0 still works. Keep a local copy of the zip.
+
+- Always back up with TWRP before making changes.
