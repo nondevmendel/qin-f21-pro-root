@@ -12,8 +12,10 @@ Complete guide and files for rooting the **DuoQin F21 Pro** (MT6761, Android 11)
 | Zygisk Next (zygisksu) | 1.3.4 | Zygisk implementation |
 | PlayIntegrityFork | v16 | Fingerprint spoofing |
 | YuriKey | 3.0.5 | Keybox provisioning |
-| TrickyStoreOSS | 2.1.0 | Keystore injection (HIDL Android 11) |
+| TrickyStoreOSS | 2.0.0 / 2.1.0 hybrid | Keystore injection (HIDL Android 11) — see note below |
 | **YuriKey Auto-Refresh** | 1.0 | Weekly automatic keybox/fingerprint renewal |
+
+> **TrickyStoreOSS hybrid build required.** Flashing v2.1.0 cleanly crashes the Java daemon (JNI bug in v2.1.0's `classes.dex`); flashing v2.0.0 cleanly causes a keystore SEGFAULT (v2.0.0's `.so` is incompatible with this device). The working install uses `classes.dex`, `daemon`, `service.sh`, and `sepolicy.rule` from v2.0.0 with `libTrickyStoreOSS.so` and `inject` from v2.1.0. See `CLAUDE.md` → Troubleshooting → "TrickyStoreOSS crashes on startup" for the exact ADB commands.
 
 ---
 
@@ -69,7 +71,11 @@ magiskpolicy --live \
   "allow magisk keystore unix_dgram_socket *" \
   "allow adb_data_file keystore unix_dgram_socket *" \
   "allow adb_data_file keystore process *" \
-  "allow system_file keystore process *" 2>/dev/null
+  "allow system_file keystore process *" \
+  "allow keystore adb_data_file dir search" \
+  "allow keystore adb_data_file dir open" \
+  "allow keystore adb_data_file dir read" \
+  "allow keystore adb_data_file dir getattr" 2>/dev/null
 ```
 
 Push via ADB:
